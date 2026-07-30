@@ -7,7 +7,7 @@ du code pour ne pas mélanger contexte commercial et contexte technique.
 |---|---|
 | [docsearch-ingestion](../docsearch-ingestion) | Extraction, ACL, indexation |
 | [docsearch-api](../docsearch-api) | API de recherche |
-| [docsearch-ui](../docsearch-ui) | Interface web statique |
+| [docsearch-ui-vue](../docsearch-ui-vue) | Interface web (Vue 3, conforme au Système de Design de l'État) |
 | [docsearch-infra](../docsearch-infra) | Orchestration Docker Compose |
 | **docsearch-docs** (ce dépôt) | Documents commerciaux |
 
@@ -18,6 +18,9 @@ du code pour ne pas mélanger contexte commercial et contexte technique.
 | `proposition_docsearch.docx` | Proposition de déploiement (contexte, architecture, coûts, planning) |
 | `guide_install_virtualbox.docx` | Guide d'installation pas à pas sur VM VirtualBox |
 | `docsearch_dsfr_v2.pptx` | Présentation PowerPoint de synthèse (charte DSFR) |
+| `docsearch_presentation_fonctionnelle.docx` | Présentation fonctionnelle (périmètre, publics) |
+| `guide_install_production_8_serveurs.docx` | Installation en production (8 serveurs) |
+| `guide_mise_a_jour_production.docx` | Mise à jour d'une installation en production |
 
 ## Chiffres clés (à jour au 02/07/2026)
 
