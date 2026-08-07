@@ -64,6 +64,11 @@ Pour la configuration à chaud (Redis — types de fichiers, filtres de chemin, 
 
 Chaque dépôt (docsearch-api, docsearch-ingestion, docsearch-ui-vue) évolue et se déploie indépendamment — inutile de reconstruire les 3 images pour une modification touchant un seul dépôt.
 
+> **📌  Version produit : le fichier VERSION, dans les 3 dépôts**
+> La version affichée aux utilisateurs (pied de page, aide) et en administration vient du fichier `VERSION` à la racine de chaque dépôt construit en image. Elle est **déclarative et identique dans les trois** : la monter fait partie de la préparation d'une livraison, avant `./manage.sh build`, jamais après. Le commit et la date de construction, eux, sont relevés automatiquement dans git par `manage.sh` et n'ont pas à être tenus à jour.
+>
+> Une mise à jour ne portant que sur une brique laisse volontairement les versions divergentes le temps de la bascule — l'administration l'affiche en avertissement, c'est le comportement voulu (voir §9).
+
 ### 3.1 docsearch-ingestion (workers, watcher) — sans interruption
 
 Les workers sont répliqués (3 par machine d'ingestion) — les mettre à jour une machine à la fois, jamais les 3 simultanément, pour qu'il reste toujours des workers actifs consommant Kafka :
@@ -262,7 +267,10 @@ curl -s "http://<ES_DATA1_IP>:9200/docsearch-all/_count"
 # Topics Kafka accessibles
 sudo podman exec docsearch-kafka kafka-topics --bootstrap-server localhost:9092 --list
 
-# API en bonne santé
+# API en bonne santé — et surtout : la version attendue est-elle celle
+# qui répond ? "version" est celle de DocSearch, "es_version" celle
+# d'Elasticsearch. Un "commit" suffixé de "+modifie" signale une image
+# construite depuis un dépôt non commité, qui n'a rien à faire ici.
 curl -s http://<FRONTEND_IP>:8000/health
 
 # Une recherche réelle depuis l'interface (pas seulement /health)
@@ -271,6 +279,13 @@ curl -sk -X POST -H 'X-User: <compte_test>' -H 'Content-Type: application/json' 
 # Logs des workers — reprise de la consommation sans erreurs en boucle
 journalctl -u 'docsearch-worker-*' -n 50
 ```
+
+Puis, dans l'interface : **Administration › État des composants › Versions déployées**. Les trois briques (Interface, API, Ingestion) doivent annoncer la version visée. Un avertissement s'y affiche tant qu'elles divergent — c'est le contrôle qui attrape le conteneur oublié, seul symptôme visible d'une mise à jour incomplète tant qu'aucune incompatibilité ne s'est manifestée.
+
+Deux limites à connaître pour lire ce bloc correctement :
+
+- La ligne « Ingestion » est relevée sur le **watcher**, qui ne tourne que sur ingest-1. Les workers d'ingest-2 et ingest-3 partagent la même image mais ne sont pas interrogés individuellement : pendant une mise à jour rolling (§3.1), cette ligne ne dit rien de leur avancement. S'en remettre à l'ordre des opérations et aux `journalctl` de chaque machine.
+- Elle n'apparaît pas du tout tant qu'aucun battement de watcher récent n'a été reçu (moins de 120 s) — c'est alors un problème de watcher, que le bloc « État des composants » signale juste au-dessus.
 
 ## 10. Procédure de rollback
 
