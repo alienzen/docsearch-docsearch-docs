@@ -21,6 +21,7 @@ du code pour ne pas mélanger contexte commercial et contexte technique.
 | `docsearch_presentation_fonctionnelle.docx` | Présentation fonctionnelle (périmètre, publics) |
 | `guide_install_production_8_serveurs.md` | Installation en production (8 serveurs) |
 | `guide_mise_a_jour_production.md` | Mise à jour d'une installation en production |
+| `guide_supervision_zabbix.md` | Installation de la supervision Zabbix des 8 serveurs et de l'application |
 
 ## Chiffres clés (à jour au 02/07/2026)
 
@@ -32,8 +33,9 @@ du code pour ne pas mélanger contexte commercial et contexte technique.
 
 ## Deux formats, et lequel choisir
 
-**Les trois guides techniques sont en Markdown depuis le 2026-08-06** — ce
-sont eux qui changent au rythme du code, et un `.docx` ne se relit pas
+**Les guides techniques sont en Markdown** — les trois premiers depuis leur
+conversion du 2026-08-06, le guide de supervision (2026-08-10) l'ayant été
+d'emblée. Ce sont eux qui changent au rythme du code, et un `.docx` ne se relit pas
 dans un diff : une modification y est invisible à la revue, et deux
 personnes qui éditent le même fichier produisent un conflit binaire
 irréconciliable. Leurs versions Word restent récupérables dans
