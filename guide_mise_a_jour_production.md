@@ -250,6 +250,11 @@ done
 ```
 
 - Redémarrer uniquement les services concernés par le changement (pas besoin de tout relancer pour une variable qui ne touche qu'un seul rôle).
+> **⚠️  Les nouvelles variables ne s'ajoutent pas toutes seules**
+> Le script d'installation des unités n'écrase jamais un /etc/docsearch/docsearch.env existant : une variable apparue dans une nouvelle version reste absente des machines déjà installées, où le code retombe alors sur sa valeur par défaut. Comparer le fichier en place avec le modèle du dépôt (quadlet/common/docsearch.env.example) après chaque mise à jour, et reporter à la main les lignes manquantes que l'on souhaite régler.
+>
+> Variables introduites récemment : `LOG_LEVEL` (niveau du journal de l'API, défaut INFO) et `SLOW_SEARCH_MS` (durée au-delà de laquelle une recherche est signalée dans le journal, défaut 2000 ms). Cette dernière doit rester alignée avec la macro Zabbix {$DOCSEARCH.RECHERCHE.MS.MAX}, sinon la supervision alerte sur des recherches dont le journal ne dit rien.
+
 > **⚠️  ES_INDEX et ES_SEARCH_ALIAS ne migrent jamais les données existantes**
 > Changer l'une de ces deux valeurs sur un cluster déjà en production démarre un index vide — l'index précédent (et ses documents) reste inchangé mais n'est plus interrogé. Prévoir une réindexation complète après tout changement de ce type (voir §8 du guide d'installation pour la procédure d'indexation).
 
