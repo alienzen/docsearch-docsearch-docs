@@ -135,7 +135,7 @@ sudo podman exec -it docsearch-api python scripts/gerer-comptes-locaux.py \
      creer secours.admin --groupes docsearch-users,docsearch-admins
 ```
 
-Ce qui cesse de fonctionner, et qu'il faut corriger dans vos scripts : toute commande d'administration qui présentait un en-tête X-User. L'API l'ignore désormais. Ouvrir un bocal à cookies avec /auth/login, puis rejouer les appels avec « curl -b ». Le contrôle qui vérifie la bascule :
+Ce qui cesse de fonctionner, et qu'il faut corriger dans vos scripts : toute commande d'administration qui présentait un en-tête X-User. L'API l'ignore désormais. Ouvrir un bocal à cookies avec /auth/login, puis rejouer les appels avec « curl -b » — la recette complète est au §9, sur l'exemple d'une recherche. Le contrôle qui vérifie la bascule :
 
 ```bash
 curl -H 'X-User: un.admin' https://<FRONTEND_IP>/admin/status   # doit répondre 401
@@ -316,8 +316,30 @@ sudo podman exec docsearch-kafka kafka-topics --bootstrap-server localhost:9092 
 # construite depuis un dépôt non commité, qui n'a rien à faire ici.
 curl -s http://<FRONTEND_IP>:8000/health
 
-# Une recherche réelle depuis l'interface (pas seulement /health)
-curl -sk -X POST -H 'X-User: <compte_test>' -H 'Content-Type: application/json' -d '{"query":"test"}' https://<FRONTEND_IP>/search
+# Une recherche réelle (pas seulement /health) — en deux temps depuis la
+# bascule du §3.3 : l'en-tête X-User n'identifie plus personne, il faut
+# ouvrir une session et rejouer l'appel avec son cookie.
+#
+# 1. Ouvrir le bocal à cookies. Le mot de passe est saisi à l'invite, pour
+#    qu'il n'atterrisse ni dans l'historique du shell ni dans « ps ».
+read -rsp 'Mot de passe de <compte_test> : ' MDP && echo
+curl -sk -c /tmp/ds-cookies -X POST -H 'Content-Type: application/json' \
+     --data-binary @- https://<FRONTEND_IP>/auth/login <<JSON
+{"identifiant": "<compte_test>", "mot_de_passe": "$MDP"}
+JSON
+unset MDP
+#   → 200 et un JSON décrivant le compte. Un 401 vise les identifiants,
+#     un 503 la paire de clés ou l'annuaire (§3.3), pas la recherche.
+#   Un mot de passe contenant " ou \ casserait ce JSON : choisir un compte
+#   de test qui n'en a pas plutôt que d'échapper à la main.
+
+# 2. La recherche elle-même, avec le cookie de session
+curl -sk -b /tmp/ds-cookies -X POST -H 'Content-Type: application/json' \
+     -d '{"query":"test"}' https://<FRONTEND_IP>/search
+
+# Le bocal contient le cookie de rafraîchissement, valable 7 jours par
+# défaut (JWT_REFRESH_TOKEN_TTL_DAYS) : l'effacer.
+rm -f /tmp/ds-cookies
 
 # Logs des workers — reprise de la consommation sans erreurs en boucle
 journalctl -u 'docsearch-worker-*' -n 50
