@@ -141,6 +141,44 @@ Ce qui cesse de fonctionner, et qu'il faut corriger dans vos scripts : toute com
 curl -H 'X-User: un.admin' https://<FRONTEND_IP>/admin/status   # doit répondre 401
 ```
 
+### 3.4 Migrations d'index — une seule fois par fonctionnalité
+
+Trois fonctionnalités livrées les 2026-08-12 et 2026-08-13 s'appuient sur des réglages d'analyse ou des champs que les index déjà créés n'ont pas. Redémarrer les conteneurs ne les pose pas : ce sont des opérations sur les index eux-mêmes, à lancer une fois, après la mise à jour du code.
+
+Le point à retenir : tant que la migration n'est pas passée, la fonctionnalité est **inerte et silencieuse**. Aucune des trois ne produit d'erreur quand son champ manque — une recherche exacte sur un index non migré ne remonte rien, sans le moindre signal dans les journaux, et se lit exactement comme « aucun document ne correspond ».
+
+Depuis ingest-1 (la machine d'où sont déjà lancées les commandes ponctuelles, §3.1) :
+
+```bash
+cd ~/docsearch/docsearch-infra
+# 1. Thésaurus métier — index fermé/rouvert quelques secondes, AUCUNE réindexation.
+#    Ne concerne que les sources fichiers : les index SQL et web ne reçoivent
+#    pas le filtre de synonymes, c'est voulu.
+sudo ./manage.sh migrer-synonymes
+
+# 2. Recherche exacte (case à cocher et opérateur « exact: ») — les trois
+#    familles d'index (fichiers, SQL, web), qui partagent l'alias de recherche.
+sudo ./manage.sh migrer-exact              # simulation, n'écrit rien
+sudo ./manage.sh migrer-exact --apply
+
+# 3. Empreinte de contenu, pour le rapport de doublons — relit les fichiers
+#    sur disque, SANS appeler Tika : pas de réindexation.
+sudo ./manage.sh backfill-hashes           # simulation, n'écrit rien
+sudo ./manage.sh backfill-hashes --apply
+```
+
+`migrer-exact` et `backfill-hashes` simulent par défaut ; `migrer-synonymes` n'a pas de simulation, étant idempotente et rejouable sans dommage. Les trois acceptent un nom de source en argument pour ne traiter que celle-là.
+
+⚠️ `migrer-exact --apply` rend la main **avant** la fin du travail : la réécriture des documents est lancée en tâche de fond côté Elasticsearch (`_update_by_query`). Suivre son avancement avec `GET _tasks/<tâche>` — l'identifiant de tâche figure dans la sortie de la commande — plutôt que de conclure au succès sur le retour de l'invite.
+
+Contrôle que la migration a bien pris, une fois la tâche terminée : cocher **Recherche exacte** dans l'interface et relancer une recherche qui donnait des résultats sans elle. Une liste vide sur toutes les sources signale un index oublié, pas un corpus vide. Côté moteur, le sous-champ doit exister :
+
+```bash
+curl -s "http://<ES_DATA1_IP>:9200/docsearch-all/_mapping/field/content.exact?pretty"
+```
+
+Le thésaurus lui-même se règle ensuite depuis **Administration › Thésaurus**, à chaud : la migration ne pose que l'analyseur, pas les règles.
+
 ## 4. Mise à jour d'Elasticsearch
 
 > **⚠️  Un seul nœud à la fois, jamais deux simultanément**
