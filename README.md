@@ -8,7 +8,7 @@ du code pour ne pas mélanger contexte commercial et contexte technique.
 | [docsearch-ingestion](../docsearch-ingestion) | Extraction, ACL, indexation |
 | [docsearch-api](../docsearch-api) | API de recherche |
 | [docsearch-ui-vue](../docsearch-ui-vue) | Interface web (Vue 3, conforme au Système de Design de l'État) |
-| [docsearch-infra](../docsearch-infra) | Orchestration Docker Compose |
+| [docsearch-infra](../docsearch-infra) | Orchestration par unités systemd Quadlet (Podman rootless) |
 | **docsearch-docs** (ce dépôt) | Documents commerciaux |
 
 ## Contenu
