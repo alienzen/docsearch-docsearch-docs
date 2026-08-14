@@ -22,6 +22,26 @@ du code pour ne pas mélanger contexte commercial et contexte technique.
 | `guide_install_production_8_serveurs.md` | Installation en production (8 serveurs) |
 | `guide_mise_a_jour_production.md` | Mise à jour d'une installation en production |
 | `guide_supervision_zabbix.md` | Installation de la supervision Zabbix des 8 serveurs et de l'application |
+| `planning-deploiement-6-mois.html` | Planning de déploiement, septembre 2026 à février 2027 (Gantt mensuel) |
+| `planning-pilote-8-semaines.html` | Planning du pilote, 1<sup>er</sup> septembre au 23 octobre 2026 (Gantt hebdomadaire) |
+| `planning-pilote-frise.html` | Frise des huit jalons du pilote, positionnés à leur date réelle |
+| `architecture-docsearch.html` | Architecture des composants : chaîne de recherche, chaîne d'ingestion, Elasticsearch |
+
+## Les quatre diagrammes
+
+Fichiers HTML autonomes (SVG en ligne, aucune dépendance à l'exécution), produits
+avec le skill `diagram-design` et la charte DSFR — Bleu France `#000091` en accent
+unique, Rouge Marianne et Vert succès délibérément écartés du dessin puisqu'ils
+portent un statut dans l'interface. Les polices viennent de Google Fonts : sur un
+poste sans accès Internet, elles retombent sur les polices système, ce qui change
+l'aspect sans rien rendre illisible.
+
+Les deux plannings s'appuient sur `proposition_docsearch.docx` §4.1 et §4.2, avec
+deux ajouts signalés en pointillé sur les planches : la bascule de
+l'authentification et la revue à mi-parcours. Le diagramme d'architecture, lui,
+décrit l'existant — unités Quadlet déployées et `guide_install_production_8_serveurs.md` —
+et non la proposition, dont la section technique est datée (Docker Compose,
+cluster à 4 nœuds).
 
 ## Chiffres clés (à jour au 02/07/2026)
 

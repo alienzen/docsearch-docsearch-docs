@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocSearch · Frise du pilote</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:#f6f6f6; --color-ink:#161616; --color-muted:#666666; --color-accent:#000091;
+      --font-sans:'Geist', system-ui, 'Segoe UI', sans-serif;
+      --font-serif:'Instrument Serif', Georgia, serif;
+      --font-mono:'Geist Mono', ui-monospace, 'DejaVu Sans Mono', monospace;
+    }
+    body { font-family: var(--font-sans); background: var(--color-paper); color: var(--color-ink); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 3rem 2rem; }
+    .frame { max-width: 1200px; width: 100%; }
+    .eyebrow { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.5rem; }
+    h1 { font-family: var(--font-serif); font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 0.5rem; }
+    .sub { font-size: 0.82rem; color: var(--color-muted); line-height: 1.5; margin-bottom: 1.5rem; max-width: 64ch; }
+    svg { width: 100%; min-width: 760px; display: block; }
+    .colophon { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted); border-top: 1px solid rgba(22,22,22,0.12); padding-top: 0.75rem; margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">DocSearch · Phase 1, démonstrateur</p>
+    <h1>Les huit moments du pilote</h1>
+    <p class="sub">Du mardi 1<sup>er</sup> septembre au vendredi 23 octobre 2026. Les points sont placés à leur date réelle : les huit semaines ne se lisent pas comme huit pas égaux, et le mois de septembre porte à lui seul cinq des huit jalons. La revue à mi-parcours du 9 octobre coupe en deux la longue phase d'observation.</p>
+
+    <!-- viewBox 0 0 1000 456. Axe x=56 (lun. 31 août) à x=952 (dim. 25 oct.) : 56 jours à 16 px -->
+    <!-- Position d'un jour d : x = 56 + 16d. Ligne de temps y=240 -->
+    <svg viewBox="0 0 1000 456" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="frise-pilote-title frise-pilote-desc">
+      <title id="frise-pilote-title">DocSearch · frise des jalons du pilote</title>
+      <desc id="frise-pilote-desc">Frise chronologique du démonstrateur DocSearch, du 1er septembre au 23 octobre 2026 : lancement le 1er septembre, pile déployée le 8, authentification LDAP en service le 18, rapport d'indexation le 25 septembre, ouverture au groupe pilote le 28, revue à mi-parcours le 9 octobre, gel des ajustements le 16 octobre, décision go/no-go du CODIR le 23 octobre.</desc>
+
+      <rect width="100%" height="100%" fill="#f6f6f6"/>
+
+      <!-- Ligne de temps -->
+      <line x1="56" y1="240" x2="952" y2="240" stroke="#161616" stroke-width="1"/>
+
+      <!-- Graduations hebdomadaires -->
+      <line x1="56" y1="232" x2="56" y2="248" stroke="rgba(22,22,22,0.25)" stroke-width="0.8"/>
+      <line x1="168" y1="232" x2="168" y2="248" stroke="rgba(22,22,22,0.25)" stroke-width="0.8"/>
+      <line x1="280" y1="232" x2="280" y2="248" stroke="rgba(22,22,22,0.25)" stroke-width="0.8"/>
+      <line x1="392" y1="232" x2="392" y2="248" stroke="rgba(22,22,22,0.25)" stroke-width="0.8"/>
+      <line x1="504" y1="232" x2="504" y2="248" stroke="rgba(22,22,22,0.25)" stroke-width="0.8"/>
+      <line x1="616" y1="232" x2="616" y2="248" stroke="rgba(22,22,22,0.25)" stroke-width="0.8"/>
+      <line x1="728" y1="232" x2="728" y2="248" stroke="rgba(22,22,22,0.25)" stroke-width="0.8"/>
+      <line x1="840" y1="232" x2="840" y2="248" stroke="rgba(22,22,22,0.25)" stroke-width="0.8"/>
+      <line x1="952" y1="232" x2="952" y2="248" stroke="rgba(22,22,22,0.25)" stroke-width="0.8"/>
+
+      <!-- ─── JALONS AU-DESSUS ─── -->
+      <!-- 1er sept. · lancement -->
+      <line x1="72" y1="236" x2="72" y2="200" stroke="rgba(22,22,22,0.30)" stroke-width="0.8"/>
+      <text x="72" y="176" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Lancement du pilote</text>
+      <text x="72" y="192" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">mar. 1er sept.</text>
+
+      <!-- 18 sept. · authentification (hors proposition) -->
+      <line x1="344" y1="236" x2="344" y2="200" stroke="rgba(22,22,22,0.30)" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="344" y="176" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Authentification LDAP</text>
+      <text x="344" y="192" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">ven. 18 sept.</text>
+
+      <!-- 28 sept. · ouverture -->
+      <line x1="504" y1="236" x2="504" y2="200" stroke="rgba(22,22,22,0.30)" stroke-width="0.8"/>
+      <text x="504" y="176" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Ouverture au groupe pilote</text>
+      <text x="504" y="192" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">lun. 28 sept.</text>
+
+      <!-- 9 oct. · revue à mi-parcours (hors proposition) -->
+      <line x1="680" y1="236" x2="680" y2="200" stroke="rgba(22,22,22,0.30)" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <text x="680" y="176" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Revue à mi-parcours</text>
+      <text x="680" y="192" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">ven. 9 oct.</text>
+
+      <!-- 23 oct. · go/no-go (focal) -->
+      <line x1="904" y1="236" x2="904" y2="200" stroke="#000091" stroke-width="0.8"/>
+      <text x="904" y="176" fill="#000091" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Décision go/no-go</text>
+      <text x="904" y="192" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">ven. 23 oct.</text>
+
+      <!-- ─── JALONS AU-DESSOUS ─── -->
+      <!-- 8 sept. · pile déployée -->
+      <line x1="184" y1="244" x2="184" y2="280" stroke="rgba(22,22,22,0.30)" stroke-width="0.8"/>
+      <text x="184" y="292" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">mar. 8 sept.</text>
+      <text x="184" y="308" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Pile déployée</text>
+
+      <!-- 25 sept. · rapport d'indexation -->
+      <line x1="456" y1="244" x2="456" y2="280" stroke="rgba(22,22,22,0.30)" stroke-width="0.8"/>
+      <text x="456" y="292" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">ven. 25 sept.</text>
+      <text x="456" y="308" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Rapport d'indexation</text>
+
+      <!-- 16 oct. · gel des ajustements -->
+      <line x1="792" y1="244" x2="792" y2="280" stroke="rgba(22,22,22,0.30)" stroke-width="0.8"/>
+      <text x="792" y="292" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">ven. 16 oct.</text>
+      <text x="792" y="308" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Gel des ajustements</text>
+
+      <!-- ─── PASTILLES (après les amorces) ─── -->
+      <circle cx="72" cy="240" r="4" fill="#161616"/>
+      <circle cx="184" cy="240" r="4" fill="#161616"/>
+      <circle cx="344" cy="240" r="4" fill="#f6f6f6" stroke="rgba(22,22,22,0.45)" stroke-width="1" stroke-dasharray="3,2"/>
+      <circle cx="456" cy="240" r="4" fill="#161616"/>
+      <circle cx="504" cy="240" r="4" fill="#161616"/>
+      <circle cx="680" cy="240" r="4" fill="#f6f6f6" stroke="rgba(22,22,22,0.45)" stroke-width="1" stroke-dasharray="3,2"/>
+      <circle cx="792" cy="240" r="4" fill="#161616"/>
+      <circle cx="904" cy="240" r="6" fill="#000091"/>
+
+      <!-- ─── BANDEAU DES MOIS ─── -->
+      <line x1="56" y1="344" x2="952" y2="344" stroke="rgba(22,22,22,0.12)" stroke-width="0.8"/>
+      <line x1="56" y1="340" x2="56" y2="348" stroke="rgba(22,22,22,0.25)" stroke-width="0.8"/>
+      <line x1="552" y1="340" x2="552" y2="348" stroke="rgba(22,22,22,0.25)" stroke-width="0.8"/>
+      <line x1="952" y1="340" x2="952" y2="348" stroke="rgba(22,22,22,0.25)" stroke-width="0.8"/>
+      <text x="304" y="364" fill="rgba(22,22,22,0.40)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">SEPTEMBRE 2026 · 5 JALONS</text>
+      <text x="752" y="364" fill="rgba(22,22,22,0.40)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">OCTOBRE · 3 JALONS</text>
+
+      <!-- ─── LÉGENDE ─── -->
+      <line x1="40" y1="396" x2="960" y2="396" stroke="rgba(22,22,22,0.12)" stroke-width="0.8"/>
+      <text x="40" y="412" fill="#666666" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">LÉGENDE</text>
+
+      <circle cx="48" cy="428" r="6" fill="#000091"/>
+      <text x="64" y="432" fill="#666666" font-size="8.5" font-family="'Geist', sans-serif">Jalon décisif · le pilote s'arrête ou continue</text>
+
+      <circle cx="336" cy="428" r="4" fill="#161616"/>
+      <text x="352" y="432" fill="#666666" font-size="8.5" font-family="'Geist', sans-serif">Jalon du plan d'origine</text>
+
+      <circle cx="536" cy="428" r="4" fill="#f6f6f6" stroke="rgba(22,22,22,0.45)" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="552" y="432" fill="#666666" font-size="8.5" font-family="'Geist', sans-serif">Ajout hors proposition</text>
+
+      <line x1="728" y1="422" x2="728" y2="434" stroke="rgba(22,22,22,0.25)" stroke-width="0.8"/>
+      <text x="744" y="432" fill="#666666" font-size="8.5" font-family="'Geist', sans-serif">Début de semaine</text>
+    </svg>
+
+    <p class="colophon">Source : proposition_docsearch.docx §4.2 · échelle linéaire, 16 px par jour</p>
+  </div>
+</body>
+</html>

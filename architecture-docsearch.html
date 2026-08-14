@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocSearch · Architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:#f6f6f6; --color-ink:#161616; --color-muted:#666666; --color-accent:#000091;
+      --font-sans:'Geist', system-ui, 'Segoe UI', sans-serif;
+      --font-serif:'Instrument Serif', Georgia, serif;
+      --font-mono:'Geist Mono', ui-monospace, 'DejaVu Sans Mono', monospace;
+    }
+    body { font-family: var(--font-sans); background: var(--color-paper); color: var(--color-ink); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 3rem 2rem; }
+    .frame { max-width: 1200px; width: 100%; }
+    .eyebrow { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.5rem; }
+    h1 { font-family: var(--font-serif); font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 0.5rem; }
+    .sub { font-size: 0.82rem; color: var(--color-muted); line-height: 1.5; margin-bottom: 1.5rem; max-width: 66ch; }
+    svg { width: 100%; min-width: 760px; display: block; }
+    .cards { display: grid; grid-template-columns: 1.1fr 1fr 0.9fr; gap: 1rem; margin-top: 1.75rem; }
+    .card { background: #ffffff; border: 1px solid rgba(22,22,22,0.12); border-radius: 6px; padding: 1.25rem; }
+    .card .eyebrow { margin-bottom: 0.6rem; }
+    .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; }
+    .card-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+    .dot-accent { background: var(--color-accent); }
+    .dot-ink { background: var(--color-ink); }
+    .dot-muted { background: var(--color-muted); }
+    .card h3 { font-size: 0.9rem; font-weight: 600; }
+    .card p, .card li { font-size: 0.78rem; line-height: 1.55; color: var(--color-muted); }
+    .card ul { padding-left: 1rem; }
+    .card li { margin-bottom: 0.35rem; }
+    .colophon { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted); border-top: 1px solid rgba(22,22,22,0.12); padding-top: 0.75rem; margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">DocSearch · Architecture</p>
+    <h1>Deux chaînes, un seul point de rencontre</h1>
+    <p class="sub">L'indexation (en bas) et la recherche (en haut) ne partagent rien d'autre qu'Elasticsearch : c'est ce qui fait qu'une panne d'ingestion ne se voit pas à l'écran. Chaque boîte est un conteneur piloté par une unité Quadlet ; les noms de machines renvoient aux 8 serveurs de production.</p>
+
+    <!-- viewBox 0 0 1000 764. Bandes : recherche y=80-224, données y=288-376, ingestion y=448-680 -->
+    <svg viewBox="0 0 1000 764" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="architecture-title architecture-desc">
+      <title id="architecture-title">DocSearch · architecture des composants</title>
+      <desc id="architecture-desc">Architecture en trois tiers : la chaîne de recherche (Nginx et interface Vue, API FastAPI, Redis) interroge Elasticsearch et s'authentifie sur un annuaire LDAP externe ; la chaîne d'ingestion (watcher et scan des partages de fichiers, bases SQL et sites web, file Kafka, workers d'indexation appuyés sur Apache Tika) écrit dans le même Elasticsearch, seul composant partagé par les deux chaînes.</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#666666"/>
+        </marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#000091"/>
+        </marker>
+        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#0063cb"/>
+        </marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f6f6f6"/>
+
+      <!-- ─── ZONES ─── -->
+      <rect x="24" y="80" width="944" height="144" rx="8" fill="rgba(22,22,22,0.02)" stroke="rgba(22,22,22,0.10)" stroke-width="0.8"/>
+      <rect x="44" y="84" width="248" height="12" rx="2" fill="#f6f6f6"/>
+      <text x="168" y="92" fill="rgba(22,22,22,0.40)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">RECHERCHE · MACHINE FRONTEND</text>
+
+      <rect x="24" y="448" width="944" height="232" rx="8" fill="rgba(22,22,22,0.02)" stroke="rgba(22,22,22,0.10)" stroke-width="0.8"/>
+      <rect x="44" y="452" width="252" height="12" rx="2" fill="#f6f6f6"/>
+      <text x="170" y="460" fill="rgba(22,22,22,0.40)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">INGESTION · KAFKA + INGEST-1 À 3</text>
+
+      <!-- ─── FLUX (avant les boîtes) ─── -->
+      <!-- Nginx → API -->
+      <line x1="308" y1="156" x2="376" y2="156" stroke="#666666" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="322" y="136" width="40" height="12" rx="2" fill="#f6f6f6"/>
+      <text x="342" y="144" fill="#666666" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">PROXY</text>
+
+      <!-- API → Redis -->
+      <line x1="624" y1="156" x2="692" y2="156" stroke="#666666" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="636" y="136" width="44" height="12" rx="2" fill="#f6f6f6"/>
+      <text x="658" y="144" fill="#666666" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">CONFIG</text>
+
+      <!-- API → Elasticsearch -->
+      <line x1="560" y1="200" x2="560" y2="288" stroke="#666666" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="572" y="232" width="88" height="12" rx="2" fill="#f6f6f6"/>
+      <text x="576" y="240" fill="#666666" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.06em">RECHERCHE · ACL</text>
+
+      <!-- API → Annuaire -->
+      <path d="M 440,200 V 236 Q 440,244 432,244 H 160 Q 152,244 152,252 V 288"
+            fill="none" stroke="#666666" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="266" y="224" width="60" height="12" rx="2" fill="#f6f6f6"/>
+      <text x="296" y="232" fill="#666666" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">LDAP · JWT</text>
+
+      <!-- Collecte → Kafka -->
+      <line x1="272" y1="520" x2="392" y2="520" stroke="#666666" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="308" y="500" width="48" height="12" rx="2" fill="#f6f6f6"/>
+      <text x="332" y="508" fill="#666666" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">PRODUIT</text>
+
+      <!-- Kafka → Workers -->
+      <line x1="608" y1="520" x2="728" y2="520" stroke="#666666" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="640" y="500" width="56" height="12" rx="2" fill="#f6f6f6"/>
+      <text x="668" y="508" fill="#666666" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">CONSOMME</text>
+
+      <!-- Workers → Tika -->
+      <line x1="836" y1="560" x2="836" y2="592" stroke="#666666" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+      <!-- Workers → Elasticsearch -->
+      <path d="M 760,480 V 408 Q 760,400 752,400 H 708 Q 700,400 700,392 V 376"
+            fill="none" stroke="#666666" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="772" y="428" width="48" height="12" rx="2" fill="#f6f6f6"/>
+      <text x="776" y="436" fill="#666666" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.06em">INDEXE</text>
+
+      <!-- Workers → Redis -->
+      <line x1="886" y1="480" x2="886" y2="200" stroke="#666666" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+      <rect x="796" y="328" width="80" height="12" rx="2" fill="#f6f6f6"/>
+      <text x="872" y="336" fill="#666666" font-size="8" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.06em">CONFIG À CHAUD</text>
+
+      <!-- ─── BOÎTES ─── -->
+      <!-- Nginx + interface -->
+      <rect x="60" y="112" width="248" height="88" rx="6" fill="#f6f6f6"/>
+      <rect x="60" y="112" width="248" height="88" rx="6" fill="#ffffff" stroke="#161616" stroke-width="1"/>
+      <rect x="68" y="118" width="32" height="12" rx="2" fill="transparent" stroke="rgba(22,22,22,0.40)" stroke-width="0.8"/>
+      <text x="84" y="128" fill="rgba(22,22,22,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">WEB</text>
+      <text x="184" y="156" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Nginx + interface Vue 3</text>
+      <text x="184" y="176" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">80/443 · seul port public</text>
+
+      <!-- API -->
+      <rect x="376" y="112" width="248" height="88" rx="6" fill="#f6f6f6"/>
+      <rect x="376" y="112" width="248" height="88" rx="6" fill="#ffffff" stroke="#161616" stroke-width="1"/>
+      <rect x="384" y="118" width="32" height="12" rx="2" fill="transparent" stroke="rgba(22,22,22,0.40)" stroke-width="0.8"/>
+      <text x="400" y="128" fill="rgba(22,22,22,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">API</text>
+      <text x="500" y="156" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">API FastAPI</text>
+      <text x="500" y="176" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">recherche · ACL · admin</text>
+
+      <!-- Redis -->
+      <rect x="692" y="112" width="248" height="88" rx="6" fill="#f6f6f6"/>
+      <rect x="692" y="112" width="248" height="88" rx="6" fill="rgba(22,22,22,0.05)" stroke="#666666" stroke-width="1"/>
+      <rect x="700" y="118" width="40" height="12" rx="2" fill="transparent" stroke="rgba(102,102,102,0.40)" stroke-width="0.8"/>
+      <text x="720" y="128" fill="rgba(102,102,102,0.90)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">CACHE</text>
+      <text x="816" y="156" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Redis</text>
+      <text x="816" y="176" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">réglages · sessions · verrous</text>
+
+      <!-- Annuaire LDAP -->
+      <rect x="56" y="288" width="192" height="88" rx="6" fill="#f6f6f6"/>
+      <rect x="56" y="288" width="192" height="88" rx="6" fill="rgba(22,22,22,0.03)" stroke="rgba(22,22,22,0.30)" stroke-width="1"/>
+      <rect x="64" y="294" width="36" height="12" rx="2" fill="transparent" stroke="rgba(22,22,22,0.30)" stroke-width="0.8"/>
+      <text x="82" y="304" fill="rgba(22,22,22,0.70)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">LDAP</text>
+      <text x="152" y="332" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Annuaire</text>
+      <text x="152" y="352" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">hors des 8 serveurs</text>
+
+      <!-- Elasticsearch (focal) -->
+      <rect x="340" y="288" width="400" height="88" rx="6" fill="#f6f6f6"/>
+      <rect x="340" y="288" width="400" height="88" rx="6" fill="rgba(0,0,145,0.08)" stroke="#000091" stroke-width="1"/>
+      <rect x="348" y="294" width="28" height="12" rx="2" fill="transparent" stroke="rgba(0,0,145,0.40)" stroke-width="0.8"/>
+      <text x="362" y="304" fill="#000091" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">ES</text>
+      <text x="540" y="332" fill="#000091" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Elasticsearch</text>
+      <text x="540" y="352" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">es-data-1 · es-data-2 · es-voting</text>
+
+      <!-- Collecte -->
+      <rect x="56" y="480" width="216" height="80" rx="6" fill="#f6f6f6"/>
+      <rect x="56" y="480" width="216" height="80" rx="6" fill="#ffffff" stroke="#161616" stroke-width="1"/>
+      <rect x="64" y="486" width="36" height="12" rx="2" fill="transparent" stroke="rgba(22,22,22,0.40)" stroke-width="0.8"/>
+      <text x="82" y="496" fill="rgba(22,22,22,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SCAN</text>
+      <text x="164" y="520" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Watcher + scan complet</text>
+      <text x="164" y="540" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">partages · SQL · web</text>
+
+      <!-- Kafka -->
+      <rect x="392" y="480" width="216" height="80" rx="6" fill="#f6f6f6"/>
+      <rect x="392" y="480" width="216" height="80" rx="6" fill="rgba(22,22,22,0.05)" stroke="#666666" stroke-width="1"/>
+      <rect x="400" y="486" width="32" height="12" rx="2" fill="transparent" stroke="rgba(102,102,102,0.40)" stroke-width="0.8"/>
+      <text x="416" y="496" fill="rgba(102,102,102,0.90)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">FILE</text>
+      <text x="500" y="520" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Kafka</text>
+      <text x="500" y="540" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">KRaft · broker unique</text>
+
+      <!-- Workers -->
+      <rect x="728" y="480" width="216" height="80" rx="6" fill="#f6f6f6"/>
+      <rect x="728" y="480" width="216" height="80" rx="6" fill="#ffffff" stroke="#161616" stroke-width="1"/>
+      <rect x="736" y="486" width="44" height="12" rx="2" fill="transparent" stroke="rgba(22,22,22,0.40)" stroke-width="0.8"/>
+      <text x="758" y="496" fill="rgba(22,22,22,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">WORKER</text>
+      <text x="836" y="520" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Workers d'indexation</text>
+      <text x="836" y="540" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">9 réplicas</text>
+
+      <!-- Tika -->
+      <rect x="728" y="592" width="216" height="64" rx="6" fill="#f6f6f6"/>
+      <rect x="728" y="592" width="216" height="64" rx="6" fill="#ffffff" stroke="#161616" stroke-width="1"/>
+      <rect x="736" y="598" width="32" height="12" rx="2" fill="transparent" stroke="rgba(22,22,22,0.40)" stroke-width="0.8"/>
+      <text x="752" y="608" fill="rgba(22,22,22,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">TIKA</text>
+      <text x="836" y="624" fill="#161616" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Apache Tika</text>
+      <text x="836" y="644" fill="#666666" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">6 instances · extraction</text>
+
+      <!-- ─── LÉGENDE ─── -->
+      <line x1="40" y1="704" x2="960" y2="704" stroke="rgba(22,22,22,0.12)" stroke-width="0.8"/>
+      <text x="40" y="720" fill="#666666" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">LÉGENDE</text>
+
+      <rect x="40" y="732" width="20" height="12" rx="3" fill="rgba(0,0,145,0.08)" stroke="#000091" stroke-width="1"/>
+      <text x="68" y="740" fill="#666666" font-size="8.5" font-family="'Geist', sans-serif">Le point de rencontre</text>
+
+      <rect x="216" y="732" width="20" height="12" rx="3" fill="#ffffff" stroke="#161616" stroke-width="1"/>
+      <text x="244" y="740" fill="#666666" font-size="8.5" font-family="'Geist', sans-serif">Service conteneurisé</text>
+
+      <rect x="416" y="732" width="20" height="12" rx="3" fill="rgba(22,22,22,0.05)" stroke="#666666" stroke-width="1"/>
+      <text x="444" y="740" fill="#666666" font-size="8.5" font-family="'Geist', sans-serif">File ou cache</text>
+
+      <rect x="576" y="732" width="20" height="12" rx="3" fill="rgba(22,22,22,0.03)" stroke="rgba(22,22,22,0.30)" stroke-width="1"/>
+      <text x="604" y="740" fill="#666666" font-size="8.5" font-family="'Geist', sans-serif">Hors des 8 serveurs</text>
+
+      <line x1="756" y1="736" x2="776" y2="736" stroke="#666666" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <text x="784" y="740" fill="#666666" font-size="8.5" font-family="'Geist', sans-serif">Lecture de configuration</text>
+    </svg>
+
+    <div class="cards">
+      <div class="card">
+        <p class="eyebrow">Ce que dit le schéma</p>
+        <div class="card-header"><span class="card-dot dot-accent"></span><h3>Un seul composant partagé</h3></div>
+        <p>Les workers écrivent dans Elasticsearch, l'API y lit. En dehors de Redis — que les workers relisent pour leur configuration à chaud — les deux chaînes ne se touchent pas. C'est cette séparation qui rend la recherche mesurable indépendamment de l'ingestion.</p>
+      </div>
+      <div class="card">
+        <p class="eyebrow">Panne</p>
+        <div class="card-header"><span class="card-dot dot-muted"></span><h3>Kafka tombe</h3></div>
+        <p>L'indexation des nouveaux documents s'arrête, la recherche continue : elle ne dépend ni de Kafka ni des machines d'ingestion. Un message perdu est rattrapé au scan complet suivant — la file est un répartiteur de travail, pas un journal durable.</p>
+      </div>
+      <div class="card">
+        <p class="eyebrow">Vigilance</p>
+        <div class="card-header"><span class="card-dot dot-ink"></span><h3>Deux points fragiles</h3></div>
+        <ul>
+          <li><code>ES_HOST</code> ne pointe que sur es-data-1 : si ce nœud tombe, l'API perd son point d'entrée même si le cluster tient.</li>
+          <li>La machine frontend est la seule exposée en 80/443 ; tout le reste doit rester injoignable de l'extérieur.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="colophon">Sources : quadlet/ (unités déployées) · guide_install_production_8_serveurs.md · PLAN-AUTH-SSO.md</p>
+  </div>
+</body>
+</html>
