@@ -267,13 +267,34 @@ Le compte de secours porte ses propres groupes, et c'est tout son intérêt : l'
 Monter le même partage réseau des sources (lecture seule) que sur frontend, puis :
 
 ```bash
-# ingest-1 uniquement (le watcher est un singleton) :
+# ingest-1 uniquement : le watcher ET le worker des modules
+# complémentaires sont des singletons — un seul exemplaire dans la grappe.
 sudo ./quadlet/install-units.sh ingest --with-singletons
 sudo ./quadlet/transfer-images.sh ingest
 
 # ingest-2 et ingest-3 :
 sudo ./quadlet/install-units.sh ingest && sudo ./quadlet/transfer-images.sh ingest
 ```
+
+### 6.6 Modules complémentaires (facultatif)
+
+Un module ne se clone pas : il arrive comme une archive, au même titre
+qu'une image (voir
+[HOWTO-deploiement-hors-ligne.md](../docsearch-infra/HOWTO-deploiement-hors-ligne.md)),
+et s'installe sur la machine qui doit l'héberger — **ingest-1** pour un
+module qui pousse des documents, **frontend** pour un module qui expose
+des écrans.
+
+```bash
+sudo ./manage.sh plugin install /chemin/<module>-<version>.tar
+sudo ./manage.sh plugin enable <module>
+./manage.sh plugin list
+```
+
+Le réseau `docsearch-plugins`, sur lequel ces conteneurs sont isolés, est
+créé par `install-units.sh` — rien à faire de plus. Voir
+[HOWTO-creer-module-complementaire.md](../docsearch-infra/HOWTO-creer-module-complementaire.md)
+pour en écrire un.
 
 ## 7. Ordre de démarrage et vérification
 
