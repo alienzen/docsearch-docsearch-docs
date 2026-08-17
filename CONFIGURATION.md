@@ -134,6 +134,7 @@ ont un effet côté API (`export`, `collections`, `custom_keywords`, `alerts`,
 | `login_inscription_url` | `""` (vide = lien masqué) |
 | `login_mot_de_passe_oublie_url` | `""` (vide = lien masqué) |
 | `sources_mount_display` | `""` (le chemin brut est copié tel quel) |
+| `search_examples` | les quatre exemples historiques, **un par ligne** (vide = bloc d'exemples masqué sur l'écran d'accueil) |
 
 Les sept thèmes de couleur maison (`slate`, `red`, `contrast`…) ont été retirés
 avec la migration DSFR ; les valeurs héritées encore stockées dans Redis sont
