@@ -135,6 +135,15 @@ ont un effet côté API (`export`, `collections`, `custom_keywords`, `alerts`,
 | `login_mot_de_passe_oublie_url` | `""` (vide = lien masqué) |
 | `sources_mount_display` | `""` (le chemin brut est copié tel quel) |
 | `search_examples` | les quatre exemples historiques, **un par ligne** (vide = bloc d'exemples masqué sur l'écran d'accueil) |
+| `default_search` | `""` (vide = écran d'accueil habituel) — recherche jouée à l'ouverture de la page de recherche, dans la **syntaxe de la barre de recherche**, opérateurs compris (`source:RH type:pdf note de service`) |
+
+`default_search` ne contourne aucun droit : la recherche part du navigateur du
+visiteur, authentifiée comme les siennes, et reste filtrée par SES ACL — deux
+personnes aux droits différents ouvrant la même installation voient deux listes
+différentes. Le réglage choisit **quoi** chercher, jamais qui a le droit de le
+voir. Il s'efface par ailleurs devant les critères du visiteur : arrivé par un
+permalien, un signet ou un rechargement, c'est SA recherche qui est rejouée
+(`useRechercheParDefaut.ts`).
 
 Les sept thèmes de couleur maison (`slate`, `red`, `contrast`…) ont été retirés
 avec la migration DSFR ; les valeurs héritées encore stockées dans Redis sont
